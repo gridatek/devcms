@@ -74,7 +74,7 @@ services:
       PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
 
   meta:
-    image: supabase/postgres-meta:latest
+    image: supabase/postgres-meta:canary-pr-971
     container_name: devcms_meta
     depends_on:
       - postgres

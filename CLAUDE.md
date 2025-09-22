@@ -22,10 +22,10 @@ devcms/
 ├── packages/
 │   ├── shared/         # Shared TypeScript types and utilities
 │   └── generator/      # Core component generation engine with CLI
+│       └── templates/  # EJS templates for component generation
 ├── database/
 │   ├── migrations/     # PostgreSQL schema and sample data
 │   └── seeds/          # Sample content for development
-├── templates/          # EJS templates for component generation
 └── tools/              # Development and deployment scripts
 ```
 
@@ -90,7 +90,7 @@ SITE_ID=default-site
 - `media` - File storage with metadata
 
 ### Template System
-- EJS templates in `/templates/` directory drive component generation
+- EJS templates in `packages/generator/templates/` directory drive component generation
 - Templates use database schema introspection to generate type-safe Angular components
 - Route discovery automatically creates navigation from database content
 - Support for custom template overrides and component extensions

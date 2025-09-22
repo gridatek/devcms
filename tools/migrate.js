@@ -56,7 +56,7 @@ async function checkDatabase() {
     console.log('✅ Database connection successful\n');
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    console.error('Make sure Docker containers are running: docker-compose up -d');
+    console.error('Make sure Docker containers are running: docker compose up -d');
     process.exit(1);
   } finally {
     await pool.end();

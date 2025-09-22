@@ -35,7 +35,7 @@ async function setup() {
 
     // Start Docker containers
     console.log('🐳 Starting Docker containers...');
-    await execAsync('docker-compose up -d');
+    await execAsync('docker compose up -d');
     console.log('✅ Docker containers started\n');
 
     // Wait for database to be ready

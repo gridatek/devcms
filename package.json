@@ -19,8 +19,8 @@
     "test:e2e:ui": "playwright test --ui",
     "db:migrate": "node tools/migrate.js",
     "db:seed": "node tools/seed.js",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
     "setup": "node tools/setup.js",
     "deploy": "node tools/deploy.js"
   },

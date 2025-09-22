@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 test.describe('Component Generation', () => {
   test.beforeEach(async () => {
     // Reset Docker environment with fresh data
-    await execAsync('docker-compose down -v && docker-compose up -d');
+    await execAsync('docker compose down -v && docker compose up -d');
     await execAsync('npm run db:migrate');
     await execAsync('npm run db:seed');
   });

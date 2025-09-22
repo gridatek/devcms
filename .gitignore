@@ -139,7 +139,7 @@ Thumbs.db
 Thumbs.db
 
 # Docker
-docker-compose.override.yml
+compose.override.yml
 
 # Database
 *.db

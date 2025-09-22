@@ -963,7 +963,6 @@ INSERT INTO settings (site_id, key, value, type, description) VALUES
     "@angular-devkit/build-angular": "^17.0.0",
     "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
-    "@nguniversal/builders": "^17.0.0",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.18.0",
     "jasmine-core": "~5.1.0",

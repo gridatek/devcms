@@ -41,7 +41,7 @@ services:
       - ./config/kong.yml:/var/lib/kong/kong.yml
 
   auth:
-    image: supabase/gotrue:latest
+    image: supabase/gotrue:v2.180.0-rc.15
     container_name: devcms_auth
     depends_on:
       - postgres

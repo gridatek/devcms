@@ -1,0 +1,199 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
+
+@Component({
+  selector: 'app-product-<%= product.slug %>',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <div class="grid md:grid-cols-2 gap-12">
+        <!-- Product Images -->
+        <div class="space-y-4">
+          <% if (product.featured_image) { %>
+          <div class="aspect-w-1 aspect-h-1">
+            <img
+              src="<%= product.featured_image %>"
+              alt="<%= product.name %>"
+              class="w-full h-96 object-cover rounded-lg shadow-lg"
+            />
+          </div>
+          <% } %>
+
+          <% if (product.gallery && product.gallery.length > 0) { %>
+          <div class="grid grid-cols-4 gap-2">
+            <% product.gallery.forEach(image => { %>
+            <img
+              src="<%= image %>"
+              alt="<%= product.name %>"
+              class="w-full h-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+            />
+            <% }); %>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Product Details -->
+        <div class="space-y-6">
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">
+              <%= product.name %>
+            </h1>
+
+            <% if (product.description) { %>
+            <div class="prose text-gray-600 mb-6">
+              <%- product.description %>
+            </div>
+            <% } %>
+          </div>
+
+          <!-- Pricing -->
+          <div class="border-t border-gray-200 pt-6">
+            <div class="flex items-center space-x-4 mb-4">
+              <% if (product.sale_price && product.sale_price < product.price) { %>
+              <span class="text-3xl font-bold text-red-600">$<%= product.sale_price %></span>
+              <span class="text-xl text-gray-500 line-through">$<%= product.price %></span>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                Sale
+              </span>
+              <% } else { %>
+              <span class="text-3xl font-bold text-gray-900">$<%= product.price %></span>
+              <% } %>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-6">
+              <% if (product.stock_quantity > 0) { %>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                In Stock (<%= product.stock_quantity %> available)
+              </span>
+              <% } else { %>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+                Out of Stock
+              </span>
+              <% } %>
+            </div>
+
+            <!-- SKU -->
+            <% if (product.sku) { %>
+            <p class="text-sm text-gray-500 mb-6">SKU: <%= product.sku %></p>
+            <% } %>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+              <% if (product.stock_quantity > 0) { %>
+              <button class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                Add to Cart
+              </button>
+              <% } else { %>
+              <button disabled class="w-full bg-gray-300 text-gray-500 py-3 px-6 rounded-lg font-medium cursor-not-allowed">
+                Out of Stock
+              </button>
+              <% } %>
+
+              <button class="w-full border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                Add to Wishlist
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Attributes -->
+          <% if (product.attributes && Object.keys(product.attributes).length > 0) { %>
+          <div class="border-t border-gray-200 pt-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Specifications</h3>
+            <dl class="space-y-2">
+              <% Object.entries(product.attributes).forEach(([key, value]) => { %>
+              <div class="flex justify-between">
+                <dt class="text-sm text-gray-600 capitalize"><%= key.replace(/_/g, ' ') %>:</dt>
+                <dd class="text-sm text-gray-900"><%= Array.isArray(value) ? value.join(', ') : value %></dd>
+              </div>
+              <% }); %>
+            </dl>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Back to Products -->
+      <div class="mt-12 text-center">
+        <a
+          routerLink="/products"
+          class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+        >
+          <svg class="mr-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+          </svg>
+          Back to all products
+        </a>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .aspect-w-1 {
+      position: relative;
+      padding-bottom: 100%;
+    }
+
+    .aspect-w-1 img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  `]
+})
+export class Product<%= product.slug.charAt(0).toUpperCase() + product.slug.slice(1).replace(/-/g, '') %>Component implements OnInit {
+
+  constructor(
+    private meta: Meta,
+    private title: Title
+  ) {}
+
+  ngOnInit(): void {
+    this.setSEO();
+  }
+
+  private setSEO(): void {
+    const pageTitle = '<%= product.name %>';
+    this.title.setTitle(`${pageTitle} | <%= site.name %>`);
+
+    <% if (product.description) { %>
+    this.meta.updateTag({
+      name: 'description',
+      content: '<%= product.description.replace(/'/g, "\\'").substring(0, 160) %>'
+    });
+    <% } %>
+
+    // Open Graph tags
+    this.meta.updateTag({ property: 'og:title', content: pageTitle });
+    <% if (product.description) { %>
+    this.meta.updateTag({
+      property: 'og:description',
+      content: '<%= product.description.replace(/'/g, "\\'").substring(0, 160) %>'
+    });
+    <% } %>
+    this.meta.updateTag({ property: 'og:type', content: 'product' });
+    <% if (product.featured_image) { %>
+    this.meta.updateTag({ property: 'og:image', content: '<%= product.featured_image %>' });
+    <% } %>
+
+    // Product-specific meta tags
+    this.meta.updateTag({ property: 'product:price:amount', content: '<%= product.sale_price || product.price %>' });
+    this.meta.updateTag({ property: 'product:price:currency', content: 'USD' });
+    <% if (product.stock_quantity > 0) { %>
+    this.meta.updateTag({ property: 'product:availability', content: 'in stock' });
+    <% } else { %>
+    this.meta.updateTag({ property: 'product:availability', content: 'out of stock' });
+    <% } %>
+  }
+}

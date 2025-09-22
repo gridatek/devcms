@@ -1,8 +1,8 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { createClient, SupabaseClient, User, Session } from '@supabase/supabase-js';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
+import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface AuthUser {
   id: string;

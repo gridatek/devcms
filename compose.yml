@@ -14,7 +14,7 @@ services:
       - ./database/migrations:/docker-entrypoint-initdb.d
 
   supabase-studio:
-    image: supabase/studio:20240101-5cc8a7c
+    image: supabase/studio:latest
     container_name: devcms_studio
     ports:
       - "54323:3000"

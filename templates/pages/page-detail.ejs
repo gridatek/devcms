@@ -1,0 +1,218 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
+
+@Component({
+  selector: 'app-page-<%= page.slug %>',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <article class="max-w-4xl mx-auto px-4 py-8">
+      <% if (!page.is_homepage) { %>
+      <header class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          <%= page.title %>
+        </h1>
+
+        <% if (page.excerpt) { %>
+        <p class="text-xl text-gray-600 mb-6">
+          <%= page.excerpt %>
+        </p>
+        <% } %>
+
+        <div class="flex items-center text-gray-500 text-sm">
+          <% if (page.author) { %>
+          <span class="mr-4">By <%= page.author.first_name %> <%= page.author.last_name %></span>
+          <% } %>
+          <% if (page.published_at) { %>
+          <time [attr.datetime]="'<%= page.published_at %>'">
+            Updated <%= new Date(page.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+          </time>
+          <% } %>
+        </div>
+      </header>
+      <% } %>
+
+      <div class="prose prose-lg max-w-none">
+        <%- page.content %>
+      </div>
+
+      <% if (page.slug === 'contact') { %>
+      <!-- Contact Form -->
+      <div class="mt-12 bg-gray-50 rounded-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
+        <form class="space-y-6">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                Name *
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+              Message *
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              rows="6"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            ></textarea>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              class="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            >
+              Send Message
+            </button>
+          </div>
+        </form>
+      </div>
+      <% } %>
+    </article>
+  `,
+  styles: [`
+    .prose {
+      color: #374151;
+    }
+    .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+      color: #111827;
+      font-weight: 600;
+    }
+    .prose h1 { font-size: 2.25rem; line-height: 2.5rem; margin-bottom: 1rem; }
+    .prose h2 { font-size: 1.875rem; line-height: 2.25rem; margin-top: 2rem; margin-bottom: 1rem; }
+    .prose h3 { font-size: 1.5rem; line-height: 2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .prose p { margin-bottom: 1rem; line-height: 1.75; }
+    .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    .prose li { margin-bottom: 0.5rem; }
+    .prose blockquote {
+      border-left: 4px solid #3B82F6;
+      padding-left: 1rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: #6B7280;
+    }
+    .prose code {
+      background-color: #F3F4F6;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+    }
+    .prose pre {
+      background-color: #1F2937;
+      color: #F9FAFB;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .prose pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+    .prose img {
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  `]
+})
+export class Page<%= page.slug.charAt(0).toUpperCase() + page.slug.slice(1).replace(/-/g, '') %>Component implements OnInit {
+
+  constructor(
+    private meta: Meta,
+    private title: Title
+  ) {}
+
+  ngOnInit(): void {
+    this.setSEO();
+  }
+
+  private setSEO(): void {
+    // Set page title
+    const pageTitle = '<%= page.meta_title || page.title %>';
+    <% if (page.is_homepage) { %>
+    this.title.setTitle('<%= site.name %>');
+    <% } else { %>
+    this.title.setTitle(`${pageTitle} | <%= site.name %>`);
+    <% } %>
+
+    // Set meta description
+    <% if (page.meta_description || page.excerpt) { %>
+    this.meta.updateTag({
+      name: 'description',
+      content: '<%= (page.meta_description || page.excerpt || "").replace(/'/g, "\\'") %>'
+    });
+    <% } %>
+
+    // Set Open Graph tags
+    <% if (page.is_homepage) { %>
+    this.meta.updateTag({ property: 'og:title', content: '<%= site.name %>' });
+    <% } else { %>
+    this.meta.updateTag({ property: 'og:title', content: pageTitle });
+    <% } %>
+
+    <% if (page.meta_description || page.excerpt) { %>
+    this.meta.updateTag({
+      property: 'og:description',
+      content: '<%= (page.meta_description || page.excerpt || "").replace(/'/g, "\\'") %>'
+    });
+    <% } %>
+    this.meta.updateTag({ property: 'og:type', content: 'website' });
+
+    // Set Twitter Card tags
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary' });
+    <% if (page.is_homepage) { %>
+    this.meta.updateTag({ name: 'twitter:title', content: '<%= site.name %>' });
+    <% } else { %>
+    this.meta.updateTag({ name: 'twitter:title', content: pageTitle });
+    <% } %>
+
+    <% if (page.meta_description || page.excerpt) { %>
+    this.meta.updateTag({
+      name: 'twitter:description',
+      content: '<%= (page.meta_description || page.excerpt || "").replace(/'/g, "\\'") %>'
+    });
+    <% } %>
+
+    <% if (page.author) { %>
+    this.meta.updateTag({ name: 'author', content: '<%= page.author.first_name %> <%= page.author.last_name %>' });
+    <% } %>
+  }
+}

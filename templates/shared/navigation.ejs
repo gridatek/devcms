@@ -1,0 +1,212 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+@Component({
+  selector: 'app-navigation',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <a routerLink="/" class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                <span class="text-white font-bold text-sm"><%= site.name.charAt(0) %></span>
+              </div>
+              <span class="font-bold text-xl text-gray-900"><%= site.name %></span>
+            </a>
+          </div>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center space-x-8">
+            <% navigation.forEach(item => { %>
+            <% if (!item.children || item.children.length === 0) { %>
+            <a
+              routerLink="<%= item.url %>"
+              routerLinkActive="text-blue-600"
+              [routerLinkActiveOptions]="{exact: <%= item.url === '/' %>}"
+              class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+              <% if (item.is_external) { %>target="<%= item.target || '_blank' %>" rel="noopener noreferrer"<% } %>
+            >
+              <%= item.title %>
+            </a>
+            <% } else { %>
+            <!-- Dropdown Menu -->
+            <div class="relative group">
+              <button class="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                <%= item.title %>
+                <svg class="ml-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                <div class="py-1">
+                  <% item.children.forEach(child => { %>
+                  <a
+                    routerLink="<%= child.url %>"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                    <% if (child.is_external) { %>target="<%= child.target || '_blank' %>" rel="noopener noreferrer"<% } %>
+                  >
+                    <%= child.title %>
+                  </a>
+                  <% }); %>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <% }); %>
+
+            <!-- CTA Button -->
+            <a
+              routerLink="/contact"
+              class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              Get in Touch
+            </a>
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              (click)="toggleMobileMenu()"
+              class="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600"
+            >
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="md:hidden" [class.hidden]="!isMobileMenuOpen">
+          <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+            <% navigation.forEach(item => { %>
+            <% if (!item.children || item.children.length === 0) { %>
+            <a
+              routerLink="<%= item.url %>"
+              routerLinkActive="bg-blue-50 text-blue-600"
+              [routerLinkActiveOptions]="{exact: <%= item.url === '/' %>}"
+              class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+              <% if (item.is_external) { %>target="<%= item.target || '_blank' %>" rel="noopener noreferrer"<% } %>
+              (click)="closeMobileMenu()"
+            >
+              <%= item.title %>
+            </a>
+            <% } else { %>
+            <!-- Mobile Dropdown -->
+            <div>
+              <button
+                (click)="toggleMobileSubmenu('<%= item.id %>')"
+                class="w-full flex items-center justify-between px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+              >
+                <%= item.title %>
+                <svg class="h-4 w-4 transform transition-transform" [class.rotate-180]="isMobileSubmenuOpen('<%= item.id %>')" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              <div *ngIf="isMobileSubmenuOpen('<%= item.id %>')" class="pl-4 space-y-1">
+                <% item.children.forEach(child => { %>
+                <a
+                  routerLink="<%= child.url %>"
+                  class="block px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
+                  <% if (child.is_external) { %>target="<%= child.target || '_blank' %>" rel="noopener noreferrer"<% } %>
+                  (click)="closeMobileMenu()"
+                >
+                  <%= child.title %>
+                </a>
+                <% }); %>
+              </div>
+            </div>
+            <% } %>
+            <% }); %>
+
+            <!-- Mobile CTA -->
+            <a
+              routerLink="/contact"
+              class="block px-3 py-2 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+              (click)="closeMobileMenu()"
+            >
+              Get in Touch
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  `,
+  styles: [`
+    .group:hover .group-hover\\:opacity-100 {
+      opacity: 1;
+    }
+    .group:hover .group-hover\\:visible {
+      visibility: visible;
+    }
+    .rotate-180 {
+      transform: rotate(180deg);
+    }
+  `]
+})
+export class NavigationComponent implements OnInit {
+  isMobileMenuOpen = false;
+  openMobileSubmenus = new Set<string>();
+
+  navigation = [
+    <% navigation.forEach((item, index) => { %>
+    {
+      id: '<%= item.id %>',
+      title: '<%= item.title %>',
+      url: '<%= item.url %>',
+      order: <%= item.order %>,
+      is_external: <%= item.is_external || false %>,
+      target: '<%= item.target || "_self" %>',
+      <% if (item.children && item.children.length > 0) { %>
+      children: [
+        <% item.children.forEach((child, childIndex) => { %>
+        {
+          id: '<%= child.id %>',
+          title: '<%= child.title %>',
+          url: '<%= child.url %>',
+          is_external: <%= child.is_external || false %>,
+          target: '<%= child.target || "_self" %>'
+        }<%= childIndex < item.children.length - 1 ? ',' : '' %>
+        <% }); %>
+      ]
+      <% } else { %>
+      children: []
+      <% } %>
+    }<%= index < navigation.length - 1 ? ',' : '' %>
+    <% }); %>
+  ];
+
+  constructor() {}
+
+  ngOnInit(): void {}
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    if (!this.isMobileMenuOpen) {
+      this.openMobileSubmenus.clear();
+    }
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
+    this.openMobileSubmenus.clear();
+  }
+
+  toggleMobileSubmenu(itemId: string): void {
+    if (this.openMobileSubmenus.has(itemId)) {
+      this.openMobileSubmenus.delete(itemId);
+    } else {
+      this.openMobileSubmenus.add(itemId);
+    }
+  }
+
+  isMobileSubmenuOpen(itemId: string): boolean {
+    return this.openMobileSubmenus.has(itemId);
+  }
+}

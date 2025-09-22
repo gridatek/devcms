@@ -1,0 +1,207 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { Meta, Title } from '@angular/platform-browser';
+
+@Component({
+  selector: 'app-post-<%= post.slug %>',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <article class="max-w-4xl mx-auto px-4 py-8">
+      <header class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          <%= post.title %>
+        </h1>
+
+        <div class="flex items-center text-gray-600 mb-4">
+          <% if (post.author) { %>
+          <span class="mr-4">By <%= post.author.first_name %> <%= post.author.last_name %></span>
+          <% } %>
+          <time class="mr-4" [attr.datetime]="'<%= post.published_at %>'">
+            <%= new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+          </time>
+          <% if (post.reading_time) { %>
+          <span><%= post.reading_time %> min read</span>
+          <% } %>
+        </div>
+
+        <% if (post.category) { %>
+        <div class="mb-4">
+          <a
+            routerLink="/category/<%= post.category.slug %>"
+            class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
+          >
+            <%= post.category.name %>
+          </a>
+        </div>
+        <% } %>
+
+        <% if (post.featured_image) { %>
+        <div class="mb-8">
+          <img
+            src="<%= post.featured_image %>"
+            alt="<%= post.title %>"
+            class="w-full h-64 object-cover rounded-lg shadow-lg"
+          />
+        </div>
+        <% } %>
+      </header>
+
+      <div class="prose prose-lg max-w-none mb-8">
+        <%- post.content %>
+      </div>
+
+      <% if (post.tags && post.tags.length > 0) { %>
+      <div class="border-t pt-6 mb-8">
+        <h3 class="text-lg font-semibold mb-3">Tags</h3>
+        <div class="flex flex-wrap gap-2" data-testid="tags">
+          <% post.tags.forEach(tag => { %>
+          <a
+            routerLink="/tag/<%= tag.slug %>"
+            class="inline-block px-3 py-1 rounded-full text-sm font-medium hover:opacity-80 transition-opacity"
+            style="background-color: <%= tag.color %>20; color: <%= tag.color %>; border: 1px solid <%= tag.color %>40;"
+          >
+            <%= tag.name %>
+          </a>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <% if (relatedPosts && relatedPosts.length > 0) { %>
+      <div class="border-t pt-8">
+        <h3 class="text-2xl font-bold mb-6">Related Posts</h3>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% relatedPosts.forEach(related => { %>
+          <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <% if (related.featured_image) { %>
+            <img
+              src="<%= related.featured_image %>"
+              alt="<%= related.title %>"
+              class="w-full h-48 object-cover"
+            />
+            <% } %>
+            <div class="p-4">
+              <h4 class="font-semibold mb-2">
+                <a routerLink="/blog/<%= related.slug %>" class="hover:text-blue-600 transition-colors">
+                  <%= related.title %>
+                </a>
+              </h4>
+              <% if (related.excerpt) { %>
+              <p class="text-gray-600 text-sm">
+                <%= related.excerpt %>
+              </p>
+              <% } %>
+            </div>
+          </article>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+    </article>
+  `,
+  styles: [`
+    .prose {
+      color: #374151;
+    }
+    .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+      color: #111827;
+      font-weight: 600;
+    }
+    .prose h1 { font-size: 2.25rem; line-height: 2.5rem; margin-bottom: 1rem; }
+    .prose h2 { font-size: 1.875rem; line-height: 2.25rem; margin-top: 2rem; margin-bottom: 1rem; }
+    .prose h3 { font-size: 1.5rem; line-height: 2rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .prose p { margin-bottom: 1rem; line-height: 1.75; }
+    .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    .prose li { margin-bottom: 0.5rem; }
+    .prose blockquote {
+      border-left: 4px solid #3B82F6;
+      padding-left: 1rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: #6B7280;
+    }
+    .prose code {
+      background-color: #F3F4F6;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+    }
+    .prose pre {
+      background-color: #1F2937;
+      color: #F9FAFB;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    .prose pre code {
+      background-color: transparent;
+      padding: 0;
+    }
+  `]
+})
+export class Post<%= post.slug.charAt(0).toUpperCase() + post.slug.slice(1).replace(/-/g, '') %>Component implements OnInit {
+
+  constructor(
+    private route: ActivatedRoute,
+    private meta: Meta,
+    private title: Title
+  ) {}
+
+  ngOnInit(): void {
+    this.setSEO();
+  }
+
+  private setSEO(): void {
+    // Set page title
+    const pageTitle = '<%= post.meta_title || post.title %>';
+    this.title.setTitle(`${pageTitle} | <%= site.name %>`);
+
+    // Set meta description
+    <% if (post.meta_description || post.excerpt) { %>
+    this.meta.updateTag({
+      name: 'description',
+      content: '<%= (post.meta_description || post.excerpt).replace(/'/g, "\\'") %>'
+    });
+    <% } %>
+
+    // Set Open Graph tags
+    this.meta.updateTag({ property: 'og:title', content: pageTitle });
+    <% if (post.meta_description || post.excerpt) { %>
+    this.meta.updateTag({
+      property: 'og:description',
+      content: '<%= (post.meta_description || post.excerpt).replace(/'/g, "\\'") %>'
+    });
+    <% } %>
+    this.meta.updateTag({ property: 'og:type', content: 'article' });
+    <% if (post.featured_image) { %>
+    this.meta.updateTag({ property: 'og:image', content: '<%= post.featured_image %>' });
+    <% } %>
+
+    // Set Twitter Card tags
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:title', content: pageTitle });
+    <% if (post.meta_description || post.excerpt) { %>
+    this.meta.updateTag({
+      name: 'twitter:description',
+      content: '<%= (post.meta_description || post.excerpt).replace(/'/g, "\\'") %>'
+    });
+    <% } %>
+
+    // Set article-specific meta tags
+    <% if (post.author) { %>
+    this.meta.updateTag({ name: 'author', content: '<%= post.author.first_name %> <%= post.author.last_name %>' });
+    <% } %>
+    this.meta.updateTag({ property: 'article:published_time', content: '<%= post.published_at %>' });
+    <% if (post.category) { %>
+    this.meta.updateTag({ property: 'article:section', content: '<%= post.category.name %>' });
+    <% } %>
+    <% if (post.tags) { %>
+    <% post.tags.forEach(tag => { %>
+    this.meta.addTag({ property: 'article:tag', content: '<%= tag.name %>' });
+    <% }); %>
+    <% } %>
+  }
+}

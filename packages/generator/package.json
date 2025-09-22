@@ -1,0 +1,33 @@
+{
+  "name": "@devcms/generator",
+  "version": "1.0.0",
+  "bin": {
+    "devcms-generate": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "generate": "node dist/core/component-generator.js",
+    "routes": "node dist/core/route-discovery.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "commander": "^11.0.0",
+    "chalk": "^5.0.0",
+    "ora": "^7.0.0",
+    "fs-extra": "^11.0.0",
+    "glob": "^10.0.0",
+    "@devcms/shared": "*",
+    "pg": "^8.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/ejs": "^3.1.0",
+    "@types/fs-extra": "^11.0.0",
+    "@types/pg": "^8.10.0",
+    "typescript": "^5.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  }
+}

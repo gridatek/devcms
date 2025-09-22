@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: supabase/postgres:15.1.0.117
+    container_name: devcms_postgres
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_DB: devcms
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+
+  supabase-studio:
+    image: supabase/studio:20231103-ce42139
+    container_name: devcms_studio
+    ports:
+      - "54323:3000"
+    environment:
+      STUDIO_PG_META_URL: http://meta:8080
+      POSTGRES_PASSWORD: postgres
+      DEFAULT_ORGANIZATION_NAME: DevCMS
+      DEFAULT_PROJECT_NAME: DevCMS
+
+  kong:
+    image: kong:2.8.1
+    container_name: devcms_kong
+    ports:
+      - "54321:8000"
+      - "54444:8443"
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./config/kong.yml:/var/lib/kong/kong.yml
+
+  auth:
+    image: supabase/gotrue:v2.132.3
+    container_name: devcms_auth
+    depends_on:
+      - postgres
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: http://localhost:54321
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@postgres:5432/devcms?search_path=auth
+      GOTRUE_SITE_URL: http://localhost:4201
+      GOTRUE_URI_ALLOW_LIST: http://localhost:4200,http://localhost:4201
+      GOTRUE_DISABLE_SIGNUP: false
+      GOTRUE_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_MAILER_AUTOCONFIRM: true
+
+  rest:
+    image: postgrest/postgrest:v11.2.2
+    container_name: devcms_rest
+    depends_on:
+      - postgres
+    ports:
+      - "54325:3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres:postgres@postgres:5432/devcms
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+
+  meta:
+    image: supabase/postgres-meta:v0.68.0
+    container_name: devcms_meta
+    depends_on:
+      - postgres
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: postgres
+      PG_META_DB_NAME: devcms
+      PG_META_DB_USER: postgres
+      PG_META_DB_PORT: 5432
+      PG_META_DB_PASSWORD: postgres
+
+  storage:
+    image: supabase/storage-api:v0.46.4
+    container_name: devcms_storage
+    depends_on:
+      - postgres
+      - rest
+    environment:
+      ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+      SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/devcms
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      GLOBAL_S3_BUCKET: stub
+
+volumes:
+  postgres_data:

@@ -1,0 +1,33 @@
+{
+  "name": "devcms-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:admin": "npm run dev --workspace=@devcms/admin",
+    "dev:site": "npm run dev --workspace=@devcms/site",
+    "dev:all": "concurrently \"npm run dev:admin\" \"npm run dev:site\"",
+    "build:admin": "npm run build --workspace=@devcms/admin",
+    "build:site": "npm run build --workspace=@devcms/site",
+    "build:all": "npm run build --workspace=@devcms/admin && npm run build --workspace=@devcms/site",
+    "generate:components": "npm run generate --workspace=@devcms/generator",
+    "generate:routes": "npm run routes --workspace=@devcms/generator",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "db:migrate": "node tools/migrate.js",
+    "db:seed": "node tools/seed.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "setup": "node tools/setup.js",
+    "deploy": "node tools/deploy.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "concurrently": "^8.0.0",
+    "@playwright/test": "^1.40.0"
+  }
+}

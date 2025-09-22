@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: supabase/postgres:latest
+    image: supabase/postgres:17.6.1.005
     container_name: devcms_postgres
     ports:
       - "54322:5432"

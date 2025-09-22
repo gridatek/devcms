@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: supabase/postgres:15.1.0.117
+    image: supabase/postgres:latest
     container_name: devcms_postgres
     ports:
       - "54322:5432"
@@ -41,7 +41,7 @@ services:
       - ./config/kong.yml:/var/lib/kong/kong.yml
 
   auth:
-    image: supabase/gotrue:v2.143.0
+    image: supabase/gotrue:latest
     container_name: devcms_auth
     depends_on:
       - postgres
@@ -74,7 +74,7 @@ services:
       PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
 
   meta:
-    image: supabase/postgres-meta:v0.75.0
+    image: supabase/postgres-meta:latest
     container_name: devcms_meta
     depends_on:
       - postgres
@@ -87,7 +87,7 @@ services:
       PG_META_DB_PASSWORD: postgres
 
   storage:
-    image: supabase/storage-api:v0.55.4
+    image: supabase/storage-api:latest
     container_name: devcms_storage
     depends_on:
       - postgres

@@ -48,14 +48,20 @@ jobs:
 
     - name: Setup Docker Compose
       run: |
+        # Pull images first to avoid timeout issues
+        echo "Pulling Docker images..."
+        docker compose pull
+
         # Start the full Supabase stack
+        echo "Starting Supabase services..."
         docker compose up -d
 
         # Wait for services to be ready
         echo "Waiting for Supabase services to start..."
-        sleep 30
+        sleep 45
 
         # Check if services are running
+        echo "Checking service status..."
         docker compose ps
 
     - name: Wait for database

@@ -108,7 +108,7 @@ import { NotificationService } from '../../core/services/notification.service';
           <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
             <h3 class="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
             <p class="text-sm text-blue-800">
-              Email: <code class="bg-blue-100 px-1 rounded">admin@devcms.dev</code><br>
+              Email: <code class="bg-blue-100 px-1 rounded">admin&#64;devcms.dev</code><br>
               Password: <code class="bg-blue-100 px-1 rounded">devcms123</code>
             </p>
             <button

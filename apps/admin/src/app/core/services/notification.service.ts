@@ -29,10 +29,10 @@ export class NotificationService {
     this.notificationsSubject.next([...currentNotifications, newNotification]);
 
     // Auto remove after duration
-    if (newNotification.duration > 0) {
+    if ((newNotification.duration ?? 0) > 0) {
       const timeout = setTimeout(() => {
         this.removeNotification(id);
-      }, newNotification.duration);
+      }, newNotification.duration ?? 0);
 
       this.autoRemoveTimeouts.set(id, timeout);
     }

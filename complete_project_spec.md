@@ -11,7 +11,7 @@ This document contains everything needed to generate the complete DevCMS project
 ```
 devcms/
 ├── package.json                    # Root workspace configuration
-├── docker-compose.yml             # Supabase local development stack
+├── compose.yml             # Supabase local development stack
 ├── .gitignore                      # Git ignore patterns
 ├── README.md                       # Project documentation
 ├── claude.md                       # Architecture documentation
@@ -258,9 +258,9 @@ devcms/
     "test:e2e:ui": "playwright test --ui",
     "db:migrate": "node tools/migrate.js",
     "db:seed": "node tools/seed.js",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:reset": "docker-compose down -v && docker-compose up -d",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v && docker compose up -d",
     "setup": "node tools/setup.js",
     "deploy": "node tools/deploy.js"
   },-project",
@@ -270,9 +270,9 @@ devcms/
     "test:e2e:ui": "playwright test --ui",
     "db:migrate": "node tools/migrate.js",
     "db:seed": "node tools/seed.js",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:reset": "docker-compose down -v && docker-compose up -d",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v && docker compose up -d",
     "setup": "node tools/setup.js",
     "deploy": "node tools/deploy.js"
   },
@@ -287,7 +287,7 @@ devcms/
 
 ### Docker Compose Configuration
 ```yaml
-# docker-compose.yml
+# compose.yml
 version: '3.8'
 
 services:
@@ -1752,7 +1752,7 @@ const execAsync = promisify(exec);
 test.describe('Component Generation', () => {
   test.beforeEach(async () => {
     // Reset Docker environment with fresh data
-    await execAsync('docker-compose down -v && docker-compose up -d');
+    await execAsync('docker compose down -v && docker compose up -d');
     await execAsync('npm run db:migrate');
     await execAsync('npm run db:seed');
   });
@@ -1843,7 +1843,7 @@ const execAsync = promisify(exec);
 
 test.describe('Template Visual Regression', () => {
   test.beforeEach(async () => {
-    await execAsync('docker-compose up -d');
+    await execAsync('docker compose up -d');
     await execAsync('npm run generate:components');
   });
 
@@ -3333,7 +3333,7 @@ async function setup() {
     console.log('📦 Checking Docker installation...');
     try {
       execSync('docker --version', { stdio: 'ignore' });
-      execSync('docker-compose --version', { stdio: 'ignore' });
+      execSync('docker compose --version', { stdio: 'ignore' });
     } catch (error) {
       throw new Error('Docker and Docker Compose are required. Please install them first.');
     }
@@ -3347,7 +3347,7 @@ async function setup() {
 
     // Start Docker services
     console.log('🐳 Starting Docker services...');
-    execSync('docker-compose up -d', { stdio: 'inherit' });
+    execSync('docker compose up -d', { stdio: 'inherit' });
 
     // Wait for services to be ready
     console.log('⏳ Waiting for services to be ready...');

@@ -98,16 +98,32 @@ jobs:
 
     - name: Start applications for testing
       run: |
-        echo "Starting applications..."
+        echo "Starting applications for testing..."
+        
+        # Start admin app (port 4200)
+        echo "Starting admin app..."
         npm run dev:admin &
+        ADMIN_PID=$!
+        
+        # Start site app (port 4201) 
+        echo "Starting site app..."
         npm run dev:site &
-
+        SITE_PID=$!
+        
         # Wait for apps to start
         echo "Waiting for applications to start..."
-        timeout 60 bash -c 'until curl -f http://localhost:4200 >/dev/null 2>&1; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f http://localhost:4201 >/dev/null 2>&1; do sleep 2; done'
-
-        echo "Applications are ready!"
+        sleep 45
+        
+        # Test if both apps are accessible
+        echo "Testing admin app accessibility..."
+        timeout 60 bash -c 'until curl -f http://localhost:4200 >/dev/null 2>&1; do echo "Waiting for admin app..."; sleep 5; done' || (echo "Admin app not accessible"; exit 1)
+        echo "Admin app is accessible on port 4200"
+        
+        echo "Testing site app accessibility..."
+        timeout 60 bash -c 'until curl -f http://localhost:4201 >/dev/null 2>&1; do echo "Waiting for site app..."; sleep 5; done' || (echo "Site app not accessible"; exit 1)
+        echo "Site app is accessible on port 4201"
+        
+        echo "Both applications are ready!"
 
     - name: Run E2E tests
       run: |
@@ -128,6 +144,16 @@ jobs:
     - name: Show logs on failure
       if: failure()
       run: |
+        echo "=== Process Status ==="
+        ps aux | grep -E "(ng serve|node)" || echo "No Angular/Node processes found"
+        
+        echo "=== Port Status ==="
+        netstat -tlnp | grep -E "(4200|4201)" || echo "Ports 4200/4201 not listening"
+        
+        echo "=== Application Health Check ==="
+        curl -v http://localhost:4200 || echo "Admin app (4200) not responding"
+        curl -v http://localhost:4201 || echo "Site app (4201) not responding"
+        
         echo "=== Docker Compose Logs ==="
         docker compose logs
         echo "=== Container Status ==="

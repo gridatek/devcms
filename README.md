@@ -43,10 +43,10 @@ devcms/
 ├── packages/
 │   ├── shared/         # Shared TypeScript types and utilities
 │   └── generator/      # Core component generation engine with CLI
+│       └── templates/  # EJS templates for component generation
 ├── database/
 │   ├── migrations/     # PostgreSQL schema and sample data
 │   └── seeds/          # Sample content for development
-├── templates/          # EJS templates for component generation
 └── tools/              # Development and deployment scripts
 ```
 
@@ -130,7 +130,7 @@ The database schema is defined in `database/migrations/001_initial_schema.sql` a
 - **Row Level Security (RLS)** for data isolation
 
 ### Template System
-Templates in `templates/` use EJS syntax and receive:
+Templates in `packages/generator/templates/` use EJS syntax and receive:
 - Content data from database tables
 - Schema metadata for type-safe generation
 - Site configuration and navigation
@@ -138,12 +138,17 @@ Templates in `templates/` use EJS syntax and receive:
 
 Example template structure:
 ```
-templates/
+packages/generator/templates/
 ├── posts/
 │   ├── post-detail.ejs     # Individual post component
 │   └── post-list.ejs       # Blog listing component
 ├── pages/
 │   └── page-detail.ejs     # Static page component
+├── products/
+│   ├── product-detail.ejs  # Product component
+│   └── product-list.ejs    # Product catalog component
+├── categories/
+│   └── category-detail.ejs # Category component
 └── shared/
     └── navigation.ejs      # Navigation component
 ```
@@ -189,7 +194,7 @@ npm run test:e2e:ui        # Interactive mode
 
 - [CLAUDE.md](./CLAUDE.md) - Architecture and development guide for AI assistants
 - [Database Schema](./database/migrations/) - Complete schema documentation
-- [Template Documentation](./templates/) - EJS template examples and patterns
+- [Template Documentation](./packages/generator/templates/) - EJS template examples and patterns
 
 ## 🔗 Key Features
 

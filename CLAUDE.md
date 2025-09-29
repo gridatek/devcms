@@ -23,6 +23,11 @@ devcms/
 │   ├── shared/         # Shared TypeScript types and utilities
 │   └── generator/      # Core component generation engine with CLI
 │       └── templates/  # EJS templates for component generation
+│           ├── posts/      # Blog post templates (detail, list)
+│           ├── pages/      # Static page templates
+│           ├── products/   # Product catalog templates
+│           ├── categories/ # Category templates
+│           └── shared/     # Navigation and shared templates
 ├── database/
 │   ├── migrations/     # PostgreSQL schema and sample data
 │   └── seeds/          # Sample content for development
@@ -110,6 +115,12 @@ SITE_ID=default-site
 
 ### Template System
 - EJS templates in `packages/generator/templates/` directory drive component generation
+- Template structure:
+  - `posts/` - Blog post components (post-detail.ejs, post-list.ejs)
+  - `pages/` - Static page components (page-detail.ejs)
+  - `products/` - E-commerce components (product-detail.ejs, product-list.ejs)
+  - `categories/` - Category listing components
+  - `shared/` - Navigation and reusable components
 - Templates use database schema introspection to generate type-safe Angular components
 - Route discovery automatically creates navigation from database content
 - Support for custom template overrides and component extensions

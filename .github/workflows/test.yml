@@ -78,6 +78,11 @@ jobs:
         echo "Generating components from database..."
         npm run generate:components
 
+    - name: Generate routes
+      run: |
+        echo "Generating routes from content..."
+        npm run generate:routes
+
     - name: Build admin app
       run: |
         echo "Building admin application..."

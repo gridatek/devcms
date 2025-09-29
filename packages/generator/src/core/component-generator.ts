@@ -8,6 +8,7 @@ import {
   TemplateConfig,
   ComponentGenerationConfig
 } from '@devcms/shared';
+import { ContentData } from '../database/content-loader';
 
 export interface GeneratorOptions {
   templatesPath: string;
@@ -15,15 +16,6 @@ export interface GeneratorOptions {
   cleanOutput?: boolean;
 }
 
-export interface ContentData {
-  posts: any[];
-  pages: any[];
-  categories: any[];
-  tags: any[];
-  products: any[];
-  site: any;
-  navigation: any[];
-}
 
 export class ComponentGenerator {
   private options: GeneratorOptions;

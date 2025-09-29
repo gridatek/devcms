@@ -92,3 +92,34 @@ GRANT ALL ON auth.users TO service_role;
 -- Create storage schema
 CREATE SCHEMA IF NOT EXISTS storage;
 GRANT USAGE ON SCHEMA storage TO postgres, anon, authenticated, service_role;
+
+-- Create auth functions for RLS policies
+CREATE OR REPLACE FUNCTION auth.uid()
+RETURNS uuid
+LANGUAGE sql STABLE
+AS $$
+  SELECT COALESCE(
+    nullif(current_setting('request.jwt.claims', true)::json ->> 'sub', ''),
+    (nullif(current_setting('request.jwt.claim.sub', true), ''))
+  )::uuid
+$$;
+
+CREATE OR REPLACE FUNCTION auth.role()
+RETURNS text
+LANGUAGE sql STABLE
+AS $$
+  SELECT COALESCE(
+    nullif(current_setting('request.jwt.claims', true)::json ->> 'role', ''),
+    (nullif(current_setting('request.jwt.claim.role', true), ''))
+  )
+$$;
+
+CREATE OR REPLACE FUNCTION auth.email()
+RETURNS text
+LANGUAGE sql STABLE
+AS $$
+  SELECT COALESCE(
+    nullif(current_setting('request.jwt.claims', true)::json ->> 'email', ''),
+    (nullif(current_setting('request.jwt.claim.email', true), ''))
+  )
+$$;

@@ -217,10 +217,6 @@ devcms/
 │       │       └── user.schemas.ts
 │       └── index.ts
 │
-├── tools/                          # Development Tools
-│   ├── setup.js                    # Project initialization
-│   ├── migrate.js                  # Database migrations
-│   └── deploy.js                   # Deployment scripts
 │
 └── tests/                          # Global Test Configuration
     ├── playwright.config.ts        # Playwright configuration
@@ -256,25 +252,23 @@ devcms/
     "generate:routes": "npm run routes --workspace=@devcms/generator",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "db:migrate": "node tools/migrate.js",
-    "db:seed": "node tools/seed.js",
+    "db:migrate": "npx supabase db reset",
+    "db:seed": "echo 'Seed data included in migrations'",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:reset": "docker compose down -v && docker compose up -d",
-    "setup": "node tools/setup.js",
-    "deploy": "node tools/deploy.js"
+    "setup": "npm run supabase:start && npm run types:generate"
   },-project",
     "generate:components": "npm run generate --workspace=@devcms/generator",
     "generate:routes": "npm run routes --workspace=@devcms/generator",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "db:migrate": "node tools/migrate.js",
-    "db:seed": "node tools/seed.js",
+    "db:migrate": "npx supabase db reset",
+    "db:seed": "echo 'Seed data included in migrations'",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:reset": "docker compose down -v && docker compose up -d",
-    "setup": "node tools/setup.js",
-    "deploy": "node tools/deploy.js"
+    "setup": "npm run supabase:start && npm run types:generate"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -3319,7 +3313,7 @@ export class ContactFormComponent implements OnInit {
 
 ### Setup Script
 ```javascript
-// tools/setup.js
+// scripts/setup.js
 const fs = require('fs-extra');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -3354,7 +3348,7 @@ async function setup() {
 
     // Run database migrations
     console.log('🗄️ Running database migrations...');
-    execSync('node tools/migrate.js', { stdio: 'inherit' });
+    execSync('npx supabase db reset', { stdio: 'inherit' });
 
     // Install workspace dependencies
     console.log('📚 Installing workspace dependencies...');
@@ -3386,7 +3380,7 @@ setup();
 
 ### Migration Script
 ```javascript
-// tools/migrate.js
+// scripts/migrate.js
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');

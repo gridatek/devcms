@@ -26,8 +26,7 @@
     "db:reset": "npx supabase db reset",
     "db:push": "npx supabase db push",
     "types:generate": "npx supabase gen types typescript --local > packages/shared/src/types/database.generated.ts",
-    "setup": "npm run supabase:start && npm run types:generate",
-    "deploy": "node tools/deploy.js"
+    "setup": "npm run supabase:start && npm run types:generate"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

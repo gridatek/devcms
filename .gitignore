@@ -172,6 +172,7 @@ docker-compose.yml
 docker-compose.override.yml
 legacy/
 config.bak
+tools/
 
 # Generated documentation
 docs/generated/

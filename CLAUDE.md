@@ -31,7 +31,6 @@ devcms/
 ├── database/
 │   ├── migrations/     # PostgreSQL schema and sample data
 │   └── seeds/          # Sample content for development
-└── tools/              # Development and deployment scripts
 ```
 
 ## Common Development Commands

@@ -11,10 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:54322/devcms
-      SUPABASE_URL: http://localhost:54321
-      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-      SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
       SITE_ID: default-site
 
     steps:
@@ -30,38 +26,15 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Setup Docker Compose
+    - name: Start Supabase
       run: |
-        # Pull images first to avoid timeout issues
-        echo "Pulling Docker images..."
-        docker compose pull
+        echo "Starting Supabase local development..."
+        npx supabase start
 
-        # Start the full Supabase stack
-        echo "Starting Supabase services..."
-        docker compose up -d
-
-        # Wait for services to be ready
-        echo "Waiting for Supabase services to start..."
-        sleep 45
-
-        # Check if services are running
-        echo "Checking service status..."
-        docker compose ps
-
-    - name: Wait for database
+    - name: Check Supabase status
       run: |
-        echo "Waiting for database to be ready..."
-        timeout 60 bash -c 'until pg_isready -h localhost -p 54322 -U postgres; do sleep 2; done'
-
-    - name: Run database migrations
-      run: |
-        echo "Running database migrations..."
-        node tools/migrate.js
-
-    - name: Seed database
-      run: |
-        echo "Seeding database with test data..."
-        node tools/seed.js
+        echo "Checking Supabase status..."
+        npx supabase status
 
     - name: Build shared package
       run: |
@@ -237,7 +210,7 @@ jobs:
         curl -v http://localhost:4200 || echo "Admin app (4200) not responding"
         curl -v http://localhost:4201 || echo "Site app (4201) not responding"
         
-        echo "=== Docker Compose Logs ==="
-        docker compose logs
-        echo "=== Container Status ==="
-        docker compose ps
+        echo "=== Supabase Logs ==="
+        npx supabase logs || echo "Failed to get Supabase logs"
+        echo "=== Supabase Status ==="
+        npx supabase status || echo "Failed to get Supabase status"

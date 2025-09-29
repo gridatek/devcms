@@ -4,14 +4,19 @@
 
 ## 🚀 Quick Start
 
-1. **Clone and setup**:
+1. **Prerequisites**:
+   - Node.js 20+
+   - Docker Desktop or compatible container runtime
+
+2. **Clone and setup**:
    ```bash
    git clone <your-repo>
    cd devcms
-   npm run setup
+   npm install
+   npm run setup  # Starts Supabase and generates types
    ```
 
-2. **Start development**:
+3. **Start development**:
    ```bash
    # Start both admin and site apps
    npm run dev:all
@@ -21,11 +26,12 @@
    npm run dev:site   # Site at http://localhost:4201
    ```
 
-3. **Access services**:
+4. **Access services**:
    - **Admin Panel**: http://localhost:4200
    - **Public Site**: http://localhost:4201
    - **Supabase Studio**: http://localhost:54323
-   - **Database**: localhost:54322
+   - **API**: http://localhost:54321
+   - **Database**: postgresql://postgres:postgres@localhost:54322/postgres
 
 ## 🏗️ Architecture
 
@@ -65,12 +71,14 @@ npm run generate:components    # Generate Angular components from database conte
 npm run generate:routes        # Generate routing configuration from content
 ```
 
-### Database Management
+### Supabase Management
 ```bash
-npm run docker:up              # Start Supabase local stack
-npm run docker:down            # Stop Docker containers
-npm run db:migrate             # Run database migrations
-npm run db:seed                # Insert sample data
+npm run supabase:start         # Start Supabase local stack
+npm run supabase:stop          # Stop Supabase services
+npm run supabase:restart       # Restart Supabase services
+npm run supabase:reset         # Reset database with migrations
+npm run supabase:status        # Show service status
+npm run types:generate         # Generate TypeScript types
 ```
 
 ### Build & Deploy

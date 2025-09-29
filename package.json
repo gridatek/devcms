@@ -17,11 +17,16 @@
     "generate:routes": "npm run routes --workspace=@devcms/generator",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "db:migrate": "node tools/migrate.js",
-    "db:seed": "node tools/seed.js",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
-    "setup": "node tools/setup.js",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:restart": "npx supabase restart",
+    "supabase:reset": "npx supabase db reset",
+    "supabase:status": "npx supabase status",
+    "db:migrate": "npx supabase migration new",
+    "db:reset": "npx supabase db reset",
+    "db:push": "npx supabase db push",
+    "types:generate": "npx supabase gen types typescript --local > packages/shared/src/types/database.generated.ts",
+    "setup": "npm run supabase:start && npm run types:generate",
     "deploy": "node tools/deploy.js"
   },
   "dependencies": {
@@ -31,6 +36,7 @@
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0",
     "concurrently": "^8.0.0",
-    "@playwright/test": "^1.40.0"
+    "@playwright/test": "^1.40.0",
+    "supabase": "^1.200.0"
   }
 }

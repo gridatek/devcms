@@ -96,34 +96,84 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
 
+    - name: Verify Angular CLI and workspace
+      run: |
+        echo "Verifying Angular CLI installation..."
+        npx ng version || echo "Angular CLI not available globally, checking workspace..."
+        
+        echo "Checking workspace structure..."
+        ls -la apps/
+        ls -la apps/admin/
+        ls -la apps/site/
+        
+        echo "Verifying package.json scripts..."
+        cat package.json | grep -A 5 -B 5 "dev:admin\|dev:site"
+
     - name: Start applications for testing
       run: |
         echo "Starting applications for testing..."
         
-        # Start admin app (port 4200)
+        # Check Node.js and npm versions
+        echo "Node.js version: $(node --version)"
+        echo "npm version: $(npm --version)"
+        
+        # Start admin app (port 4200) with logging
         echo "Starting admin app..."
-        npm run dev:admin &
+        npm run dev:admin > admin.log 2>&1 &
         ADMIN_PID=$!
+        echo "Admin app PID: $ADMIN_PID"
         
-        # Start site app (port 4201) 
+        # Start site app (port 4201) with logging
         echo "Starting site app..."
-        npm run dev:site &
+        npm run dev:site > site.log 2>&1 &
         SITE_PID=$!
+        echo "Site app PID: $SITE_PID"
         
-        # Wait for apps to start
-        echo "Waiting for applications to start..."
-        sleep 45
+        # Wait a bit for initial startup
+        echo "Waiting for initial startup..."
+        sleep 30
         
-        # Test if both apps are accessible
-        echo "Testing admin app accessibility..."
-        timeout 60 bash -c 'until curl -f http://localhost:4200 >/dev/null 2>&1; do echo "Waiting for admin app..."; sleep 5; done' || (echo "Admin app not accessible"; exit 1)
-        echo "Admin app is accessible on port 4200"
+        # Check if processes are still running
+        if ! kill -0 $ADMIN_PID 2>/dev/null; then
+          echo "❌ Admin app process died early"
+          echo "Admin app logs:"
+          cat admin.log || echo "No admin logs found"
+          exit 1
+        fi
         
-        echo "Testing site app accessibility..."
-        timeout 60 bash -c 'until curl -f http://localhost:4201 >/dev/null 2>&1; do echo "Waiting for site app..."; sleep 5; done' || (echo "Site app not accessible"; exit 1)
-        echo "Site app is accessible on port 4201"
+        if ! kill -0 $SITE_PID 2>/dev/null; then
+          echo "❌ Site app process died early"
+          echo "Site app logs:"
+          cat site.log || echo "No site logs found"
+          exit 1
+        fi
         
-        echo "Both applications are ready!"
+        echo "Both processes are still running, waiting for HTTP servers..."
+        
+        # Test if both apps are accessible with longer timeout
+        echo "Testing admin app accessibility (timeout 3 minutes)..."
+        timeout 180 bash -c 'until curl -f -m 10 http://localhost:4200 >/dev/null 2>&1; do echo "Waiting for admin app... ($(date))"; sleep 10; done' || (
+          echo "❌ Admin app timeout after 3 minutes"
+          echo "Admin app logs:"
+          tail -50 admin.log 2>/dev/null || echo "No admin logs found"
+          echo "Port status:"
+          ss -tlnp | grep 4200 || echo "Port 4200 not listening"
+          exit 1
+        )
+        echo "✅ Admin app is accessible on port 4200"
+        
+        echo "Testing site app accessibility (timeout 3 minutes)..."
+        timeout 180 bash -c 'until curl -f -m 10 http://localhost:4201 >/dev/null 2>&1; do echo "Waiting for site app... ($(date))"; sleep 10; done' || (
+          echo "❌ Site app timeout after 3 minutes"
+          echo "Site app logs:"
+          tail -50 site.log 2>/dev/null || echo "No site logs found"
+          echo "Port status:"
+          ss -tlnp | grep 4201 || echo "Port 4201 not listening"
+          exit 1
+        )
+        echo "✅ Site app is accessible on port 4201"
+        
+        echo "🎉 Both applications are ready!"
 
     - name: Run E2E tests
       run: |

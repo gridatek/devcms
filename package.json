@@ -29,9 +29,6 @@
     "setup": "npm run supabase:start && npm run types:generate",
     "deploy": "node tools/deploy.js"
   },
-  "dependencies": {
-    "pg": "^8.11.0"
-  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0",

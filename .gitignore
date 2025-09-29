@@ -165,6 +165,15 @@ generated/
 # Supabase
 .supabase/
 
+# Legacy files (removed during Supabase CLI migration)
+compose.yml
+compose.override.yml
+docker-compose.yml
+docker-compose.override.yml
+legacy/
+config.bak
+tools/
+
 # Generated documentation
 docs/generated/
 

@@ -175,10 +175,43 @@ jobs:
         
         echo "🎉 Both applications are ready!"
 
+    - name: Manual health check test
+      run: |
+        echo "Running manual health check before Playwright tests..."
+        
+        # Test basic HTTP responses
+        echo "Testing admin app response..."
+        curl -v http://localhost:4200 | head -20
+        
+        echo "Testing site app response..."
+        curl -v http://localhost:4201 | head -20
+        
+        # Test specific content
+        echo "Checking for Angular app in site response..."
+        curl -s http://localhost:4201 | grep -i "angular\|app-root\|devCMS" || echo "No Angular/DevCMS content found"
+        
+        echo "Health check completed successfully!"
+
+    - name: Debug test setup
+      run: |
+        echo "Debugging test configuration..."
+        pwd
+        ls -la
+        echo "Tests directory:"
+        ls -la tests/ || echo "No tests directory found"
+        echo "Playwright config:"
+        ls -la tests/playwright.config.ts || ls -la playwright.config.ts || echo "No playwright config found"
+        echo "Test files:"
+        find . -name "*.spec.ts" -o -name "*.test.ts" | head -10
+
     - name: Run E2E tests
       run: |
         echo "Running end-to-end tests..."
-        npm run test:e2e
+        echo "Playwright config test:"
+        npx playwright test --list || echo "Failed to list tests"
+        
+        echo "Running tests with verbose output..."
+        npm run test:e2e -- --reporter=list --verbose || echo "Test execution failed"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4

@@ -1,3 +1,11 @@
+-- Insert sample user in auth.users first
+INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at) VALUES
+('550e8400-e29b-41d4-a716-446655440001', 'admin@devcms.local', '$2a$10$dummy.hash.for.dev', NOW(), NOW(), NOW());
+
+-- Insert sample user profile
+INSERT INTO profiles (id, first_name, last_name, role) VALUES
+('550e8400-e29b-41d4-a716-446655440001', 'John', 'Developer', 'admin');
+
 -- Insert sample site
 INSERT INTO sites (id, name, slug, description, owner_id, settings) VALUES
 ('550e8400-e29b-41d4-a716-446655440000', 'DevCMS Sample Site', 'devcms-sample', 'A sample site for DevCMS demonstration',
@@ -19,10 +27,6 @@ INSERT INTO sites (id, name, slug, description, owner_id, settings) VALUES
     "newsletter": false
   }
 }');
-
--- Insert sample user profile
-INSERT INTO profiles (id, first_name, last_name, role) VALUES
-('550e8400-e29b-41d4-a716-446655440001', 'John', 'Developer', 'admin');
 
 -- Insert sample categories
 INSERT INTO categories (id, site_id, name, slug, description) VALUES

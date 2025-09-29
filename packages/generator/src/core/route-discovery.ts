@@ -128,7 +128,7 @@ ${routeDefinitions}
   private generateRouteDefinitions(routes: RouteConfig[]): string {
     return routes
       .map(route => {
-        const routeObj = {
+        const routeObj: Record<string, string> = {
           path: `'${route.path}'`,
           component: route.component
         };

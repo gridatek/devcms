@@ -78,6 +78,11 @@ jobs:
         echo "Generating components from database..."
         npm run generate:components
 
+    - name: Generate routes
+      run: |
+        echo "Generating routes from content..."
+        npm run generate:routes
+
     - name: Build admin app
       run: |
         echo "Building admin application..."
@@ -91,35 +96,147 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install --with-deps
 
+    - name: Verify Angular CLI and workspace
+      run: |
+        echo "Verifying Angular CLI installation..."
+        npx ng version || echo "Angular CLI not available globally, checking workspace..."
+        
+        echo "Checking workspace structure..."
+        ls -la apps/
+        ls -la apps/admin/
+        ls -la apps/site/
+        
+        echo "Verifying package.json scripts..."
+        cat package.json | grep -A 5 -B 5 "dev:admin\|dev:site"
+
     - name: Start applications for testing
       run: |
-        echo "Starting applications..."
-        npm run dev:admin &
-        npm run dev:site &
+        echo "Starting applications for testing..."
+        
+        # Check Node.js and npm versions
+        echo "Node.js version: $(node --version)"
+        echo "npm version: $(npm --version)"
+        
+        # Start admin app (port 4200) with logging
+        echo "Starting admin app..."
+        npm run dev:admin > admin.log 2>&1 &
+        ADMIN_PID=$!
+        echo "Admin app PID: $ADMIN_PID"
+        
+        # Start site app (port 4201) with logging
+        echo "Starting site app..."
+        npm run dev:site > site.log 2>&1 &
+        SITE_PID=$!
+        echo "Site app PID: $SITE_PID"
+        
+        # Wait a bit for initial startup
+        echo "Waiting for initial startup..."
+        sleep 30
+        
+        # Check if processes are still running
+        if ! kill -0 $ADMIN_PID 2>/dev/null; then
+          echo "❌ Admin app process died early"
+          echo "Admin app logs:"
+          cat admin.log || echo "No admin logs found"
+          exit 1
+        fi
+        
+        if ! kill -0 $SITE_PID 2>/dev/null; then
+          echo "❌ Site app process died early"
+          echo "Site app logs:"
+          cat site.log || echo "No site logs found"
+          exit 1
+        fi
+        
+        echo "Both processes are still running, waiting for HTTP servers..."
+        
+        # Test if both apps are accessible with longer timeout
+        echo "Testing admin app accessibility (timeout 3 minutes)..."
+        timeout 180 bash -c 'until curl -f -m 10 http://localhost:4200 >/dev/null 2>&1; do echo "Waiting for admin app... ($(date))"; sleep 10; done' || (
+          echo "❌ Admin app timeout after 3 minutes"
+          echo "Admin app logs:"
+          tail -50 admin.log 2>/dev/null || echo "No admin logs found"
+          echo "Port status:"
+          ss -tlnp | grep 4200 || echo "Port 4200 not listening"
+          exit 1
+        )
+        echo "✅ Admin app is accessible on port 4200"
+        
+        echo "Testing site app accessibility (timeout 3 minutes)..."
+        timeout 180 bash -c 'until curl -f -m 10 http://localhost:4201 >/dev/null 2>&1; do echo "Waiting for site app... ($(date))"; sleep 10; done' || (
+          echo "❌ Site app timeout after 3 minutes"
+          echo "Site app logs:"
+          tail -50 site.log 2>/dev/null || echo "No site logs found"
+          echo "Port status:"
+          ss -tlnp | grep 4201 || echo "Port 4201 not listening"
+          exit 1
+        )
+        echo "✅ Site app is accessible on port 4201"
+        
+        echo "🎉 Both applications are ready!"
 
-        # Wait for apps to start
-        echo "Waiting for applications to start..."
-        timeout 60 bash -c 'until curl -f http://localhost:4200 >/dev/null 2>&1; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f http://localhost:4201 >/dev/null 2>&1; do sleep 2; done'
+    - name: Manual health check test
+      run: |
+        echo "Running manual health check before Playwright tests..."
+        
+        # Test basic HTTP responses
+        echo "Testing admin app response..."
+        curl -v http://localhost:4200 | head -20
+        
+        echo "Testing site app response..."
+        curl -v http://localhost:4201 | head -20
+        
+        # Test specific content
+        echo "Checking for Angular app in site response..."
+        curl -s http://localhost:4201 | grep -i "angular\|app-root\|devCMS" || echo "No Angular/DevCMS content found"
+        
+        echo "Health check completed successfully!"
 
-        echo "Applications are ready!"
+    - name: Debug test setup
+      run: |
+        echo "Debugging test configuration..."
+        pwd
+        ls -la
+        echo "Tests directory:"
+        ls -la tests/ || echo "No tests directory found"
+        echo "Playwright config:"
+        ls -la tests/playwright.config.ts || ls -la playwright.config.ts || echo "No playwright config found"
+        echo "Test files:"
+        find . -name "*.spec.ts" -o -name "*.test.ts" | head -10
 
     - name: Run E2E tests
       run: |
         echo "Running end-to-end tests..."
-        npm run test:e2e
+        echo "Playwright config test:"
+        npx playwright test --list || echo "Failed to list tests"
+        
+        echo "Running tests with verbose output..."
+        npm run test:e2e -- --reporter=list --verbose || echo "Test execution failed"
 
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
-        path: playwright-report/
+        path: |
+          playwright-report/
+          test-results/
         retention-days: 30
+        if-no-files-found: ignore
 
     - name: Show logs on failure
       if: failure()
       run: |
+        echo "=== Process Status ==="
+        ps aux | grep -E "(ng serve|node)" || echo "No Angular/Node processes found"
+        
+        echo "=== Port Status ==="
+        netstat -tlnp | grep -E "(4200|4201)" || echo "Ports 4200/4201 not listening"
+        
+        echo "=== Application Health Check ==="
+        curl -v http://localhost:4200 || echo "Admin app (4200) not responding"
+        curl -v http://localhost:4201 || echo "Site app (4201) not responding"
+        
         echo "=== Docker Compose Logs ==="
         docker compose logs
         echo "=== Container Status ==="

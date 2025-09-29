@@ -31,16 +31,21 @@ export default defineConfig({
     },
   ],
 
-  webServer: [
+  webServer: process.env.CI ? undefined : [
     {
       command: 'npm run docker:up',
       port: 54321,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
+    },
+    {
+      command: 'npm run dev:admin',
+      port: 4200,
+      reuseExistingServer: true,
     },
     {
       command: 'npm run dev:site',
       port: 4201,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: true,
     }
   ],
 });

@@ -128,16 +128,17 @@ export const SiteSettingsSchema = z.object({
   }).optional()
 });
 
-export type CreatePostRequest = z.infer<typeof CreatePostSchema>;
-export type UpdatePostRequest = z.infer<typeof UpdatePostSchema>;
-export type CreatePageRequest = z.infer<typeof CreatePageSchema>;
-export type UpdatePageRequest = z.infer<typeof UpdatePageSchema>;
-export type CreateCategoryRequest = z.infer<typeof CreateCategorySchema>;
-export type UpdateCategoryRequest = z.infer<typeof UpdateCategorySchema>;
-export type CreateTagRequest = z.infer<typeof CreateTagSchema>;
-export type UpdateTagRequest = z.infer<typeof UpdateTagSchema>;
-export type CreateProductRequest = z.infer<typeof CreateProductSchema>;
-export type UpdateProductRequest = z.infer<typeof UpdateProductSchema>;
-export type QueryOptions = z.infer<typeof QueryOptionsSchema>;
+// Export schema-inferred types with different names to avoid conflicts
+export type CreatePostSchemaType = z.infer<typeof CreatePostSchema>;
+export type UpdatePostSchemaType = z.infer<typeof UpdatePostSchema>;
+export type CreatePageSchemaType = z.infer<typeof CreatePageSchema>;
+export type UpdatePageSchemaType = z.infer<typeof UpdatePageSchema>;
+export type CreateCategorySchemaType = z.infer<typeof CreateCategorySchema>;
+export type UpdateCategorySchemaType = z.infer<typeof UpdateCategorySchema>;
+export type CreateTagSchemaType = z.infer<typeof CreateTagSchema>;
+export type UpdateTagSchemaType = z.infer<typeof UpdateTagSchema>;
+export type CreateProductSchemaType = z.infer<typeof CreateProductSchema>;
+export type UpdateProductSchemaType = z.infer<typeof UpdateProductSchema>;
+export type QueryOptionsSchemaType = z.infer<typeof QueryOptionsSchema>;
 export type GenerationRequestType = z.infer<typeof GenerationRequestSchema>;
-export type SiteSettings = z.infer<typeof SiteSettingsSchema>;
+export type SiteSettingsSchemaType = z.infer<typeof SiteSettingsSchema>;
